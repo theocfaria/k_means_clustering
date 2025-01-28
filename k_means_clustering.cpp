@@ -11,7 +11,7 @@ struct Point
 
 float defineDistance(Point p1, Point p2)
 {
-    int distance = 0;
+    float distance = 0;
     for(int i = 0; i < DIMENSIONS; i++)
     {
         distance += pow((p2.coord[i] - p1.coord[i]), 2);
