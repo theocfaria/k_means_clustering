@@ -2,7 +2,7 @@
 #include <cmath>
 #include <iomanip>
 
-#define DIMENSIONS 4
+#define DIMENSIONS 5
 using namespace std;
 
 struct Point
@@ -56,7 +56,7 @@ void recalculateCentroids(Cluster clusters[], Point data[], int assignments[], i
         int count = 0;
         for(int j = 0; j < dataSize; j++)
         {
-            if(assignments[j] == 1)
+            if(assignments[j] == i)
             {
                 for(int d = 0; d < DIMENSIONS; d++)
                 {
@@ -75,20 +75,71 @@ void recalculateCentroids(Cluster clusters[], Point data[], int assignments[], i
     }
 }
 
+
 void kMeansClustering(Point data[], int dataSize, int k, int maxIterations)
 {
     Cluster clusters[k];
     int assignments[dataSize] = {0}; // array to store each point's clusters
-}
-int main()
-{
-    Point p1, p2;
-    for(int i = 0; i < DIMENSIONS; i++)
+
+    initializeCentroids(clusters, data, k, dataSize);
+
+    for(int i = 0; i < maxIterations; i++)
     {
-        cin >> p1.coord[i];
-        cin >> p2.coord[i];
+        bool hasChanged = false;
+        
+        for(int j = 0; j < dataSize; j++)
+        {
+            int newAssignment = assignCluster(data[j], clusters, k);
+            if(newAssignment != assignments[j])
+            {
+                hasChanged = true;
+                assignments[j] = newAssignment;
+            }
+        }
+
+        recalculateCentroids(clusters, data, assignments, k, dataSize);
+        if(!hasChanged)
+        {
+            break;
+        }
     }
-    cout << fixed << setprecision(2) << defineDistance(p1, p2);
+    for(int i = 0; i < dataSize; i++)
+    {
+        cout << "Point " << i + 1<< " is in cluster " << assignments[i]<< endl;
+    }
 }
 
+char defineCoordName(int d)
+{
+    int x = 24;
+    char letter = 'a' + d + x - 1;
+    if (letter > 122)
+    {
+        letter = 97;
+    }
+    
+    return letter;
 
+}
+
+int main() {
+    srand(time(NULL));
+    int dataSize, k, maxIterations;
+    cout << "Inform the amount of points in the graph: ";
+    cin >> dataSize;
+    cout << "Inform the amount of clusters desired: ";
+    cin >> k; 
+    cout << "Inform the amount of iterations desired: ";
+    cin >> maxIterations;
+
+    Point data[dataSize];
+    for (int i = 0; i < dataSize; i++) {
+        for (int d = 0; d < DIMENSIONS; d++) {
+            cout << "Inform the coordinates " << defineCoordName(d) << " of the point " << i + 1 << ": " << endl;  
+            cin >> data[i].coord[d];
+        }
+    }
+
+    kMeansClustering(data, dataSize, k, maxIterations);
+    return 0;
+}
