@@ -34,7 +34,7 @@ void initializeCentroids(Cluster clusters[], Point data[], int k, int dataSize)
 
 int assignCluster(Point p, Cluster clusters[], int k)
 {
-    float minDistance = defineDistance(p, clusters[0]. centroid);
+    float minDistance = defineDistance(p, clusters[0].centroid);
     int clusterIndex = 0;
     for(int i = 0; i < k; i++)
     {
@@ -48,6 +48,38 @@ int assignCluster(Point p, Cluster clusters[], int k)
     return clusterIndex;
 }
 
+void recalculateCentroids(Cluster clusters[], Point data[], int assignments[], int k, int dataSize)
+{
+    for(int i = 0; i < k; i++)
+    {
+        Point newCentroid = {0};
+        int count = 0;
+        for(int j = 0; j < dataSize; j++)
+        {
+            if(assignments[j] == 1)
+            {
+                for(int d = 0; d < DIMENSIONS; d++)
+                {
+                    newCentroid.coord[d] += data[j].coord[d];
+                }
+                count++;
+            }
+        }
+        if(count > 0)
+        {
+            for(int d = 0; d < DIMENSIONS; d++)
+            {
+                clusters[i].centroid.coord[d] = newCentroid.coord[d] / count;
+            }
+        }
+    }
+}
+
+void kMeansClustering(Point data[], int dataSize, int k, int maxIterations)
+{
+    Cluster clusters[k];
+    int assignments[dataSize] = {0}; // array to store each point's clusters
+}
 int main()
 {
     Point p1, p2;
