@@ -75,7 +75,6 @@ void recalculateCentroids(Cluster clusters[], Point data[], int assignments[], i
     }
 }
 
-
 void kMeansClustering(Point data[], int dataSize, int k, int maxIterations)
 {
     Cluster clusters[k];
@@ -98,28 +97,31 @@ void kMeansClustering(Point data[], int dataSize, int k, int maxIterations)
         }
 
         recalculateCentroids(clusters, data, assignments, k, dataSize);
+
         if(!hasChanged)
         {
             break;
         }
     }
-    for(int i = 0; i < dataSize; i++)
-    {
-        cout << "Point " << i + 1<< " is in cluster " << assignments[i]<< endl;
-    }
+    for(int c = 0; c < k; c++) {
+            cout << "Centroid " << c << ": (";
+            for(int d = 0; d < DIMENSIONS; d++) {
+                cout << clusters[c].centroid.coord[d] << (d < DIMENSIONS - 1 ? ", " : "");
+            }
+            cout << ")\n";
+        }
+        for(int j = 0; j < dataSize; j++) {
+            cout << "Point " << j + 1 << " is in cluster " << assignments[j] << "\n";
+        }
+        cout << "----------------------------\n";
 }
-
-char defineCoordName(int d)
-{
-    int x = 24;
-    char letter = 'a' + d + x - 1;
-    if (letter > 122)
-    {
-        letter = 97;
-    }
+char defineCoordName(int d) {
+    const char alphabet[] = "abcdefghijklmnopqrstuvwxyz";
+    int size = sizeof(alphabet) - 1; 
     
-    return letter;
-
+    if (d >= 0 && d < size) {
+        return alphabet[d];
+    }
 }
 
 int main() {
