@@ -2,19 +2,19 @@
 #include <cmath>
 #include <iomanip>
 
-#define DIMENSIONS 5
+#define DIMENSIONS 2
 using namespace std;
 
 struct Point
 {
-    float coord[DIMENSIONS]; // 0 = x, 1 = y, 2 = z, 3 = w
+    float coord[DIMENSIONS]; // 0 = x, 1 = y, 2 = z, 3 = w...
 };
 struct Cluster
 {
     Point centroid;
 };
 
-float defineDistance(Point p1, Point p2) // defines distance between two points in 4 dimensions; scalable function;
+float defineDistance(Point p1, Point p2) // defines distance between two points in any number of dimensions
 {
     float distance = 0;
     for(int i = 0; i < DIMENSIONS; i++)
@@ -24,15 +24,15 @@ float defineDistance(Point p1, Point p2) // defines distance between two points 
     return sqrt(distance);
 }
 
-void initializeCentroids(Cluster clusters[], Point data[], int k, int dataSize)
+void initializeCentroids(Cluster clusters[], Point data[], int k, int dataSize) // chooses a random point from the dataset 
 {
     for(int i = 0; i < k; i++)
     {
-        clusters[i].centroid = data[rand() % dataSize]; // chooses a random point between 0 and (dataSize - 1)
+        clusters[i].centroid = data[rand() % dataSize]; 
     }
 }
 
-int assignCluster(Point p, Cluster clusters[], int k)
+int assignCluster(Point p, Cluster clusters[], int k) // called in the main clustering func, assigns clusters to each point 
 {
     float minDistance = defineDistance(p, clusters[0].centroid);
     int clusterIndex = 0;
@@ -48,7 +48,7 @@ int assignCluster(Point p, Cluster clusters[], int k)
     return clusterIndex;
 }
 
-void recalculateCentroids(Cluster clusters[], Point data[], int assignments[], int k, int dataSize)
+void recalculateCentroids(Cluster clusters[], Point data[], int assignments[], int k, int dataSize) // recalculate the center of each cluster after the addition of new points 
 {
     for(int i = 0; i < k; i++)
     {
@@ -75,7 +75,7 @@ void recalculateCentroids(Cluster clusters[], Point data[], int assignments[], i
     }
 }
 
-void kMeansClustering(Point data[], int dataSize, int k, int maxIterations)
+void kMeansClustering(Point data[], int dataSize, int k, int maxIterations)  // compares each point's coord with the cluster's centroid to assign each point its group
 {
     Cluster clusters[k];
     int assignments[dataSize] = {0}; // array to store each point's clusters
@@ -115,8 +115,8 @@ void kMeansClustering(Point data[], int dataSize, int k, int maxIterations)
         }
         cout << "----------------------------\n";
 }
-char defineCoordName(int d) {
-    const char alphabet[] = "abcdefghijklmnopqrstuvwxyz";
+char defineCoordName(int d) {  // defines the coordinate's name, starts from x
+    const char alphabet[] = "xyzabcdefghijklmnopqrstuvw";
     int size = sizeof(alphabet) - 1; 
     
     if (d >= 0 && d < size) {
@@ -126,12 +126,14 @@ char defineCoordName(int d) {
 
 int main() {
     srand(time(NULL));
-    int dataSize, k, maxIterations;
-    cout << "Inform the amount of points in the graph: ";
+    int dataSize;  // amount of points in the graph
+    int k;  // amount of clusters 
+    int maxIterations;  // how many times the clustering func will be called
+    cout << "Enter amount of points in the graph: ";
     cin >> dataSize;
-    cout << "Inform the amount of clusters desired: ";
+    cout << "Enter the amount of clusters desired: ";
     cin >> k; 
-    cout << "Inform the amount of iterations desired: ";
+    cout << "Enter the amount of iterations desired: ";
     cin >> maxIterations;
 
     Point data[dataSize];
