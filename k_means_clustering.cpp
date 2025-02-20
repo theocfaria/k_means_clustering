@@ -1,4 +1,3 @@
-// TODO: FINISH THE FILE READING FUNC(STILL IN MAIN)
 #include <iostream>
 #include <cmath>
 #include <iomanip>
@@ -105,6 +104,7 @@ void kMeansClustering(Point data[], int dataSize, int k, int maxIterations) // c
             break;
         }
     }
+    cout << "----------------------------\n";
     for (int c = 0; c < k; c++)
     {
         cout << "Centroid " << c << ": (";
@@ -112,7 +112,7 @@ void kMeansClustering(Point data[], int dataSize, int k, int maxIterations) // c
         {
             cout << clusters[c].centroid.coord[d] << (d < DIMENSIONS - 1 ? ", " : "");
         }
-        cout << ")\n";
+        cout << ")" << endl;
     }
     for (int j = 0; j < dataSize; j++)
     {
@@ -131,38 +131,53 @@ char defineCoordName(int d) // defines the coordinate's name, starts from x
     }
 }
 
+int countLines(string file_name)  // count the amount of lines in the file
+{
+    ifstream file(file_name);
+    if (!file.is_open())
+    {
+        cout << "Failed to open the file" << endl;
+        return -1;
+    }
+
+    string line;
+    int count = 0;
+
+    while (getline(file, line))
+    {
+        count++;
+    }
+
+    file.close();
+    return count;
+}
+
+void definePoints(Point data[], int dataSize)
+{
+    string file_name, line;
+    cout << "Inform the name of the data file desired: " << endl;
+    cin >> file_name;
+    ifstream file(file_name);
+    for(int c = 0; getline(file, line) && c < dataSize; c++)
+    {
+        stringstream lines(line);
+        lines >> data[c].coord[0] >> data[c].coord[1] >> data[c].coord[2] >> data[c].coord[3];
+        c++;
+    }
+}
+
 int main()
 {
     srand(time(NULL));
-    int dataSize = 0;  // amount of points in the graph
-    int k;             // amount of clusters
-    int maxIterations; // how many times the clustering func will be called
-    int option = 2;    // number that doesn't fulfill any of the ifs
-    cout << "Would you rather enter each point(0) or read from a file(1)?" << endl;
-    cin >> option;
-    // if (option == 0)
-    // {
-        cout << "Enter amount of points in the graph: ";
-        cin >> dataSize;
-        cout << "Enter the amount of clusters desired: ";
-        cin >> k;
-        cout << "Enter the amount of iterations desired: ";
-        cin >> maxIterations;
-        Point data[dataSize];
-        for (int i = 0; i < dataSize; i++)
-        {
-            for (int d = 0; d < DIMENSIONS; d++)
-            {
-                cout << "Inform the coordinates " << defineCoordName(d) << " of the point " << i + 1 << ": " << endl;
-                cin >> data[i].coord[d];
-            }
-        }
-    // }
-    // else if (option == 1)
-    // {
-
-    // }
-
+    int dataSize = countLines("data.txt"); // amount of points in the graph, can be read from the file or be input
+    int k;                                // amount of clusters
+    int maxIterations;                    // how many times the clustering func will be called
+    Point data[dataSize];
+    definePoints(data, dataSize);
+    cout << "Enter the amount of clusters desired: ";
+    cin >> k;
+    cout << "Enter the amount of iterations desired: ";
+    cin >> maxIterations;
     kMeansClustering(data, dataSize, k, maxIterations);
     return 0;
 }
