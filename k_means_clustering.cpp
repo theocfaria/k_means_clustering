@@ -3,7 +3,7 @@
 #include <iomanip>
 #include <fstream>
 
-#define DIMENSIONS 2
+#define DIMENSIONS 4
 using namespace std;
 
 struct Point
@@ -25,11 +25,43 @@ float defineDistance(Point p1, Point p2) // defines distance between two points 
     return sqrt(distance);
 }
 
-void initializeCentroids(Cluster clusters[], Point data[], int k, int dataSize) // chooses a random point from the dataset
+void initializeCentroids(Cluster clusters[], Point data[], int k, int dataSize) // k-means++ initialization
 {
-    for (int i = 0; i < k; i++)
+
+    clusters[0].centroid = data[rand() % dataSize]; // choose the first centroid randomly
+
+    for (int i = 1; i < k; i++) // for the remaining centroids
     {
-        clusters[i].centroid = data[rand() % dataSize];
+        float distSquared[dataSize]; // squared distance from each point to the nearest centroid
+        float totalDist = 0.0f;
+
+        for (int j = 0; j < dataSize; j++) // calculate the distance to the nearest centroid for each point
+        {
+            distSquared[j] = defineDistance(data[j], clusters[0].centroid);
+            for (int c = 1; c < i; c++) // compare with other centroids
+            {
+                float distance = defineDistance(data[j], clusters[c].centroid);
+                distSquared[j] = min(distSquared[j], distance);
+            }
+            distSquared[j] *= distSquared[j];
+            totalDist += distSquared[j];
+        }
+
+        float randChoice = (rand() / (float)RAND_MAX) * totalDist; // random value for selection
+        float cumulativeDist = 0.0f;                               // cumulative sum of squared distances
+        int chosenPoint = 0;
+
+        for (int j = 0; j < dataSize; j++) // choose the point based on proportional probability
+        {
+            cumulativeDist += distSquared[j]; // accumulate squared distances
+            if (cumulativeDist >= randChoice) // when the cumulative sum exceeds the random value
+            {
+                chosenPoint = j; // selected point as the next centroid
+                break;
+            }
+        }
+
+        clusters[i].centroid = data[chosenPoint];
     }
 }
 
@@ -53,7 +85,11 @@ void recalculateCentroids(Cluster clusters[], Point data[], int assignments[], i
 {
     for (int i = 0; i < k; i++)
     {
-        Point newCentroid = {0};
+        Point newCentroid;
+        for (int d = 0; d < DIMENSIONS; d++)
+        {
+            newCentroid.coord[d] = 0;
+        }
         int count = 0;
         for (int j = 0; j < dataSize; j++)
         {
@@ -131,7 +167,7 @@ char defineCoordName(int d) // defines the coordinate's name, starts from x
     }
 }
 
-int countLines(string file_name)  // count the amount of lines in the file
+int countLines(string file_name) // count the amount of lines in the file
 {
     ifstream file(file_name);
     if (!file.is_open())
@@ -152,28 +188,31 @@ int countLines(string file_name)  // count the amount of lines in the file
     return count;
 }
 
-void definePoints(Point data[], int dataSize)
+void definePoints(Point data[], int dataSize, string file_name)
 {
-    string file_name, line;
-    cout << "Inform the name of the data file desired: " << endl;
-    cin >> file_name;
+    string line;
     ifstream file(file_name);
-    for(int c = 0; getline(file, line) && c < dataSize; c++)
+    for (int c = 0; getline(file, line) && c < dataSize; c++)
     {
         stringstream lines(line);
-        lines >> data[c].coord[0] >> data[c].coord[1] >> data[c].coord[2] >> data[c].coord[3];
-        c++;
+        for (int i = 0; i < DIMENSIONS; i++)
+        {
+            lines >> data[c].coord[i];
+        }
     }
 }
 
 int main()
 {
     srand(time(NULL));
-    int dataSize = countLines("data.txt"); // amount of points in the graph, can be read from the file or be input
+    string file_name;
+    cout << "Inform the name of the data file desired: " << endl;
+    cin >> file_name;
+    int dataSize = countLines(file_name); // amount of points in the graph, can be read from the file or be input
     int k;                                // amount of clusters
     int maxIterations;                    // how many times the clustering func will be called
     Point data[dataSize];
-    definePoints(data, dataSize);
+    definePoints(data, dataSize, file_name);
     cout << "Enter the amount of clusters desired: ";
     cin >> k;
     cout << "Enter the amount of iterations desired: ";
