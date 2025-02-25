@@ -67,11 +67,11 @@ void initializeCentroids(Cluster clusters[], Point data[], int k, int dataSize) 
 
 int assignCluster(Point p, Cluster clusters[], int k) // called in the main clustering func, assigns clusters to each point
 {
-    float minDistance = defineDistance(p, clusters[0].centroid);
+    float minDistance = defineDistance(p, clusters[0].centroid); // defines the smallest distance between a point and the first cluster's centroid
     int clusterIndex = 0;
     for (int i = 0; i < k; i++)
     {
-        float distance = defineDistance(p, clusters[i].centroid);
+        float distance = defineDistance(p, clusters[i].centroid); // compares the smallest distance to the next's centroid
         if (distance < minDistance)
         {
             minDistance = distance;
@@ -83,30 +83,30 @@ int assignCluster(Point p, Cluster clusters[], int k) // called in the main clus
 
 void recalculateCentroids(Cluster clusters[], Point data[], int assignments[], int k, int dataSize) // recalculate the center of each cluster after the addition of new points
 {
-    for (int i = 0; i < k; i++)
+    for (int i = 0; i < k; i++) // iterates over each cluster
     {
         Point newCentroid;
-        for (int d = 0; d < DIMENSIONS; d++)
+        for (int d = 0; d < DIMENSIONS; d++) // initializes all centroid's coordinates as 0
         {
             newCentroid.coord[d] = 0;
         }
-        int count = 0;
-        for (int j = 0; j < dataSize; j++)
+        int count = 0;                     // counts all the points that belongs to the current cluster
+        for (int j = 0; j < dataSize; j++) // iterates over all the points from the data
         {
-            if (assignments[j] == i)
+            if (assignments[j] == i) // checks if the point belongs to the current cluster
             {
                 for (int d = 0; d < DIMENSIONS; d++)
                 {
-                    newCentroid.coord[d] += data[j].coord[d];
+                    newCentroid.coord[d] += data[j].coord[d]; // sums the current point's coordinates to the centroid
                 }
                 count++;
             }
         }
-        if (count > 0)
+        if (count > 0) // avoids division by 0 checking if the cluster is empty
         {
             for (int d = 0; d < DIMENSIONS; d++)
             {
-                clusters[i].centroid.coord[d] = newCentroid.coord[d] / count;
+                clusters[i].centroid.coord[d] = newCentroid.coord[d] / count; // defines new centroid's coordinates dividing the total sum by the amout of points
             }
         }
     }
@@ -117,15 +117,15 @@ void kMeansClustering(Point data[], int dataSize, int k, int maxIterations) // c
     Cluster clusters[k];
     int assignments[dataSize] = {0}; // array to store each point's clusters
 
-    initializeCentroids(clusters, data, k, dataSize);
+    initializeCentroids(clusters, data, k, dataSize); // initializes the cluster's centroids
 
-    for (int i = 0; i < maxIterations; i++)
+    for (int i = 0; i < maxIterations; i++) // main loop 
     {
-        bool hasChanged = false;
+        bool hasChanged = false; // variable to check if the assignment has changed
 
-        for (int j = 0; j < dataSize; j++)
+        for (int j = 0; j < dataSize; j++) 
         {
-            int newAssignment = assignCluster(data[j], clusters, k);
+            int newAssignment = assignCluster(data[j], clusters, k); // gets the closest cluster to each point; assignCluster() returns the cluster index
             if (newAssignment != assignments[j])
             {
                 hasChanged = true;
@@ -141,7 +141,7 @@ void kMeansClustering(Point data[], int dataSize, int k, int maxIterations) // c
         }
     }
     cout << "----------------------------\n";
-    for (int c = 0; c < k; c++)
+    for (int c = 0; c < k; c++) // prints the centroid's coordinates
     {
         cout << "Centroid " << c << ": (";
         for (int d = 0; d < DIMENSIONS; d++)
@@ -150,7 +150,7 @@ void kMeansClustering(Point data[], int dataSize, int k, int maxIterations) // c
         }
         cout << ")" << endl;
     }
-    for (int j = 0; j < dataSize; j++)
+    for (int j = 0; j < dataSize; j++) // prints each point's final assignment
     {
         cout << "Point " << j + 1 << " is in cluster " << assignments[j] << "\n";
     }
